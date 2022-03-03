@@ -10,12 +10,27 @@ import { useLocation } from 'react-router-dom';
 import Button from '@mui/material/Button';
 
 const RecordShow = () => {
-    const [data, setData] = useState<any>();
-    const [dataNew, setDataNew] = useState<any>();
+
+    interface First{
+        capital:string;
+        population:Number;
+        latlng :Number;
+        flags:string
+    }
+
+    interface second{
+        temperature:Number;
+        weather_icons:string;
+        precip:Number;
+        wind_speed:Number;
+    }
+
+   
+
+    const [data, setData] = useState<First | null>();
+    const [dataNew, setDataNew] = useState<second | null>();
     const { state } = useLocation();
     
-
-
     React.useEffect(() => {
         ApiCall();
     }, []);
@@ -31,12 +46,17 @@ const RecordShow = () => {
             .then(response => response.json())
             .then((result) => {
                 console.log(result);
-
-                setData(result);
-                // console.log(data);
+                setData({
+                    capital: result[0].capital[0],
+                    population: result[0].population,
+                    latlng: result[0].latlng[0],
+                    flags: result[0].flags['png'],
+                });
             })
             .catch(error => console.log('error', error));
     };
+
+
 
     const ApiCallWeather = () => {
         var requestOptions = {
@@ -48,11 +68,16 @@ const RecordShow = () => {
             .then(response => response.json())
             .then((result) => {
                 console.log(result);
-                setDataNew(result);
+                setDataNew({
+                    temperature: result.current.temperature,
+                    weather_icons: result.current.weather_icons,
+                    wind_speed: result.current.wind_speed,
+                    precip: result.current.precip,
+                });
               
             })
             .catch(error => console.log('error', error));
-    };
+    };   
 
     const handleClick = () =>{
         ApiCallWeather();
@@ -71,11 +96,11 @@ const RecordShow = () => {
         </TableHead>
         <TableBody>
         {data ? (
-            <TableRow>
-                <TableCell data-testid="capital"  align="center">{data[0].capital[0]}</TableCell>
-                <TableCell align="center">{data[0].population}</TableCell>
-                <TableCell align="center">{data[0].latlng[0]},{data[0].latlng[1]}</TableCell>
-                <TableCell align="center"><img src={data[0].flags['png']} /></TableCell>
+                <TableRow>
+                <TableCell data-testid="capital"  align="center">{data.capital}</TableCell>
+                <TableCell align="center">{data.population}</TableCell>
+                <TableCell align="center">{data.latlng}</TableCell>
+                <TableCell align="center"><img src={data.flags}/></TableCell>
             </TableRow>
         ) : null}
         </TableBody>
@@ -100,10 +125,10 @@ const RecordShow = () => {
                 <TableBody>
                
                     <TableRow>
-                        <TableCell align="center">{dataNew.current.temperature}</TableCell>
-                        <TableCell align="center"><img src={dataNew.current.weather_icons}/></TableCell>
-                        <TableCell align="center">{dataNew.current.wind_speed} kph</TableCell>
-                        <TableCell align="center">{dataNew.current.precip}</TableCell>
+                        <TableCell align="center">{dataNew.temperature}</TableCell>
+                        <TableCell align="center"><img src={dataNew.weather_icons}/></TableCell>
+                        <TableCell align="center">{dataNew.wind_speed} kph</TableCell>
+                        <TableCell align="center">{dataNew.precip}</TableCell>
                     </TableRow>
               
                 </TableBody>
